@@ -1,0 +1,4 @@
+---
+# tasks file for myrole
+- name: installing wget
+  shell: "sudo apt install wget -y"

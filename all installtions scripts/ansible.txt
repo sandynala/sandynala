@@ -1,0 +1,135 @@
+
+*********controller***********
+
+*****creating user*****
+
+>>sudo su
+>>root@host:useradd ansible_user
+>>passwd ansible_user
+>>visudo
+paste under root 
+ansible_user ALL=(ALL) NOPASSWD: ALL
+
+******ansible installation steps*****
+>>$ sudo apt update -y
+$ sudo apt install software-properties-common
+$ sudo add-apt-repository --yes --update ppa:ansible/ansible
+$ sudo apt install ansible -y
+
+ansible --version
+cd /etc/ansible
+vi hosts
+172.31.45.211(node ips)
+
+*****switch to ansible_user*******
+>>sudo su ansible_user
+   
+ssh-keygen
+ssh-copy-id ansible_user@172.31.45.211(target server private ip)
+password:type the passowrd that created in node 
+ssh ansible_user@172.31.45.211
+ansible all -m ping -a "df -h"
+
+
+*********node***********
+>>sudo su
+>>root@host:useradd ansible_user(user should be same as controller user)
+>>passwd ansible_user
+>>visudo
+ansible_user ALL=(ALL) NOPASSWD: ALL
+>>vi /etc/ssh/sshd_config 
+password authencation to yes
+>>service sshd restart
+
+
+>>second way 
+
+      cat ~/.ssh/id_rsa.pub | ssh -i key.pem ubuntu@172.31.45.211 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+      here key.pem should be availabe in the current directory 
+     
+      ssh ansible_suer@172.31.37.177
+
+
+
+---
+- name: Running Playbook2 where we are going to install nginx
+  hosts: web
+  become: True
+  tasks:
+  - name: Install nginx
+    apt:
+      name: nginx
+      state: latest
+  - name: Start nginx
+    service:
+      name: nginx
+      state: started
+
+sudo apt install python3.8
+sudo update-alternatives --config python
+
+https://buildvirtual.net/deploy-a-kubernetes-cluster-using-ansible/
+https://docs.ansible.com/ansible/latest/collections/ansible/builtin/lineinfile_module.html
+https://docs.ansible.com/ansible/2.4/authorized_key_module.html
+https://docs.ansible.com/ansible/2.6/user_guide/intro_inventory.html
+https://riptutorial.com/ansible/example/11493/play-s-structure
+
+
+>>Ansible facts are data gathered about target nodes 
+>>Ansible facts are stored in JSON format and are used to make important decisions about tasks
+
+lets take u have a host file where u configure different servers under web 
+
+[web]
+172.31.51.16
+172.51.16.17
+
+lets say if you want to know the data of ur target nodes(facts) ,
+ansible web -m setup
+
+
+
+>>>a playbook is a yaml file containing one or more plays 
+
+name: defines what we are doing 
+hosts: defines the target machines
+tasks:defines a set of actions to execute
+become_user: which user have to perfom these tasks 
+vars:we can use variables as same as in other programmimg languages
+handlers:used to perfom an action only when there is change in configuration and it is run after all tasks ,it is invoked by notify directive
+
+roles:independent component which allows reuse of common configuration steps.
+>>has to be used within playbook
+>>Roles are defined using YAML files with a predefined directory structure
+>>A role directory structure contains directories: 
+defaults, vars, tasks, files, templates, meta, handlers. Each directory must contain a main.yml file which contains relevant content. 
+
+1)defaults: contains default variables for the role. Variables in default have the lowest priority so they are easy to override.
+2)vars: contains variables for the role. Variables in vars have higher priority than variables in defaults directory.
+3)tasks: contains the main list of steps to be executed by the role
+4)files: contains files which we want to be copied to the remote host. We don’t need to specify a path of resources stored in this directory.
+5)templates: contains file template which supports modifications from the role. We use the Jinja2 templating language for creating templates.
+6)meta: contains metadata of role like an author, support platforms, dependencies.
+7)handlers: contains handlers which can be invoked by “notify” directives and are associated with service.
+
+by default,tasks will run as the connecting user - this might be either root or any regular user with SSH access to the remote nodes in an inventory file.
+
+become: yes(True)
+become_user:
+remote_user:
+
+Let’s suppose you want to run a task on the remote server to install some packages using yum. 
+It’s very obvious that you should become root user as Non-Root user cannot install packages, in this case, you can use ansible sudo. To be precise ansible become method
+
+Now, Let’s discuss another requirement where you have to start a WebSphere application server instance on the remote machine which runs as wsadmin user. 
+In this case, you might want to restart the instance as wsadmin only for which you can execute your ansible task with become-user method
+
+become and become_user both have to be used in a playbook in certain cases where you want your remote user to be non-root.
+it is more like doing sudo -u someuser before running a task.
+
+When you are not defining the become_user and just use become. 
+Ansible will perform the basic sudo and it will execute the corresponding task as root user
+
+
+https://www.middlewareinventory.com/blog/ansible-sudo-ansible-become-example/#:~:text=Ansible%20Sudo%20or%20become%20is,user%20or%20some%20other%20user.&text=become%20and%20become_user%20both%20have,someuser%20before%20running%20a%20task.

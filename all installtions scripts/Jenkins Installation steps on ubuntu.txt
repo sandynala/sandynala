@@ -1,0 +1,66 @@
+
+                                                    Jenkins installtion on ubuntu server
+# Install OpenJDK
+sudo apt-get update -y
+sudo apt-get install openjdk-11-jdk -y
+
+# Switch to Java 11
+sudo update-alternatives --config java
+
+# Check Java installation
+java -version
+
+# Add PPA repo for Jenkins stable LTS
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c "echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list"
+sudo apt-get update
+
+# Install Jenkins
+sudo apt-get install jenkins -y
+
+# Start Jenkins at boot time
+sudo systemctl start jenkins.service
+sudo systemctl enable jenkins.service
+sudo systemctl status jenkins.service
+				
+#change inbound rules of security group 
+Custom TCP-->P 8080 and save 
+
+#copy Public ip address
+public_ip:8080
+
+
+
+java path
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+echo $JAVA_HOME
+export PATH=$PATH:$JAVA_HOME/bin
+echo $PATH
+
+
+
+echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> ~/.bashrc
+echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc
+
+sudo apt-get install docker.io -y
+docker run -dit -p 9000:9000 --name sonar sonarqube
+docker run -dit -p 8081:8081 --name nexus sonatype/nexus3
+
+itsfoos.com/set-java-home
+
+
+readlink -f $(whereis java)
+
+
+
+/usr/lib/jvm/java-11-openjdk-amd64
+/usr/bin/git
+
+cbe94b829278db47d4cb47476554bbc70320afb2
+
+
+
+ withSonarQubeEnv(installationName: 'SonarServer') {
+                    sh 'mvn sonar:sonar -Dsonar.login=bee80c82793fc89d11329cd51a4e71ec03c3cc27'
+ 

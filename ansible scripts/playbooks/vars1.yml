@@ -1,0 +1,12 @@
+---
+- hosts: db
+  become: yes
+  vars:
+    - az1: "us-east-1a"
+    - az2: "us-east-1b"
+    - az3: "us-east-1c"
+  tasks:
+    - name: listing all azs in us-east region
+      debug:
+        msg: "the azs in us-east region are {{az1}},{{az2}},{{az3}}"      
+

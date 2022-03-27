@@ -1,0 +1,124 @@
+
+------------------------------------------------------------------------------jenkins on redhat------------------------------------------------------------------------------------------
+********hostname and usercreation***********
+
+hostnamectl set-hostname jenkins
+sudo useradd ravi
+sudo passwd ravi
+sudo visudo(granting ravi sudo access)
+ravi ALL=(ALL) NOPASSWD: ALL
+
+
+*********installing jenkins under user ravi'**************
+
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+sudo yum install epel-release # repository that provides 'daemonize'
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo yum install java-11-openjdk-devel -y
+sudo yum install jenkins -y
+sudo systemctl start jenkins.service
+sudo systemctl status jenkins.service
+sudo systemctl enable jenkins.service
+
+***********setting JAVA_PATH***************
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+echo $JAVA_HOME
+export PATH=$PATH:$JAVA_HOME/bin
+echo $PATH
+
+************to set JAVA PATH permanentlty********
+
+echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> ~/.bashrc
+echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc
+
+*********to select a particular java_version**************
+
+sudo update-alternatives --config java
+
+**********to view jenkins password*******************
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+********to install git**********
+
+sudo yum install git -y
+
+********to find path*********
+
+readlink -f $(whereis java)
+
+
+
+pub   rsa4096 2020-03-30 [SC] [expires: 2023-03-30]
+      62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+uid                      Jenkins Project 
+sub   rsa4096 2020-03-30 [E] [expires: 2023-03-30]
+------------------------------------------------------------------------------sonarqube on redhat-----------------------------------------------------------------------------------------
+****use instance type t2.medium*****
+
+hostnamectl set-hostname jenkins
+sudo useradd ravi
+sudo passwd ravi
+visudo(granting ravi sudo access)
+ravi ALL=(ALL) NOPASSWD: ALL
+
+*********** to install docker on redhat ****************
+
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/rhel/docker-ce.repo
+
+sudo yum install docker-ce docker-ce-cli containerd.io
+
+  - Status code: 404 for https://download.docker.com/linux/rhel/8/x86_64/stable/repodata/repomd.xml (IP: 99.86.231.53)
+
+Agian repeated the below stops to solve the above error
+
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+sudo systemctl status docker.service
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
+sudo netstat -lntp | grep dockerd
+sudo usermod -aG docker ravi
+
+*********** sonarqube image ****************
+
+docker run -dit --name sonar -p 9000:9000 sonarqube:latest
+
+to rename the container 
+docker rename <sad_shirley(old)> <sonar(new)>
+
+*************what if the container exiting immediately??***************
+
+you have to override the entrypoint
+docker run -it --entrypoint=/bin/bash myimagename
+
+************to install net utils on redhat linux***************
+
+sudo yum -y install net-tools
+
+************to create volume***************
+docker volume create sonar_volume
+
+
+**********to find created volume in ur local host*******
+
+docker inspect sonar_volume
+
+lets say u want to keep ur sonarqube logs to be persistent , u can mount the created volume on /opt/sonarqube/logs
+
+these created volume is availabe in ur local host machine :/var/lib/docker/volumes/sonar_volume
+
+docker run -dit --name sonar -v sonar_volume:/opt/sonarqube/logs -p 9000:9000 sonarqube:latest
+
+to know more:https://phoenixnap.com/kb/docker-volumes

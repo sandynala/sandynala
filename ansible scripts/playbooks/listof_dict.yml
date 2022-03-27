@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Installing multiple files on kubernetes directory      
+      file:
+        path: "/home/ansible_admin/{{item.filename}}"
+        state: touch
+      loop:
+        - filename: infosys.txt
+        - filename: wipro.txt      

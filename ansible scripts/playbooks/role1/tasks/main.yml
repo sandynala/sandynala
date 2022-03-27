@@ -1,0 +1,7 @@
+---
+- name: Creating user
+  user:
+    name: ravikumar99
+    state: present    
+- debug:
+    msg: " the fruit is {{fruit}}"   

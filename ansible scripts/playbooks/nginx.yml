@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    page_title: Ravi Kumar and Sandeep Estates
+    page_description: This is my landing page description.
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: latest
+
+    - name: Apply Page Template
+      template:
+        src: /home/ansible_admin/kubernetes/template/landingpage.html.j2
+        dest: /var/www/html/index.nginx-debian.html
+
+    - name: Allow all access to tcp port 80
+      ufw:
+        rule: allow
+        port: '80'
+        proto: tcp 

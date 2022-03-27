@@ -1,0 +1,10 @@
+---
+- name: Running updates on ubuntu
+  hosts: masters
+  become: yes
+  tasks:
+  - name: updating package using yum 
+      shell: apt update -y
+      user: name=sai state=present
+            
+

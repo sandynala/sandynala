@@ -1,0 +1,32 @@
+---
+- name: Play1
+  hosts: all
+  become: true
+  tasks:
+    - name: Creating an empty file
+      shell: "touch /tmp/sandeep.txt"
+    - name: Creating multiple files at a time
+      become_user: ansible_admin
+      file:
+        path: "/home/ansible_admin/kubernetes/{{item}}"
+        state: touch
+      with_items:
+              - avinash
+              - pavan
+              - akhilesh      
+    - name: Creating multiple directories at a time
+      become_user: ansible_admin
+      file:
+        path: "/home/ansible_admin/kubernetes/{{item}}"
+        state: directory
+      with_items:
+              - avin
+              - pava
+              - akhilh
+    - name: Creating a user
+      #become_user: ansible_admin
+      user:
+        name: test_user      
+        create_home: yes
+           
+

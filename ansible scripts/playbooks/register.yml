@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: lists all files and directories
+      shell: 'ls -al'
+      register: output
+    - debug:
+        var: output    

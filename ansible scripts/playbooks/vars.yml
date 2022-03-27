@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  vars:
+     batsman: "kohli"
+     bowler:  "bhuvi"
+  tasks:
+    - name: using variables
+      debug:
+        msg: " the batsman is {{batsman}}, the bowler is {{bowler}}"      

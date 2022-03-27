@@ -1,0 +1,108 @@
+kubernetes is an open orchestration tool which helps to manage containerized applications 
+>>When the trend changes from monolithic to microservices , the usage of containers also increases 
+
+>>If all the functionalities of a project exists in a single codebase, then that application is known as monolithic application.
+
+>>In simple terms , a monolithic application is a single unified unit, a microservices architecture breaks it down into a collection of smaller independent units.
+
+k8s componenets
+
+
+Pod:
+
+>>smallest unit of k8s
+>>Abstarction over contaniner
+>>you can run multiple containers in it
+>>usually 1 application per pod
+>>Lets see how these pods communicate with each other 
+>>Each pod gets its own IP address(not to the container) .this ip address is not of public ips ,its internals ips where pods will communicate with each other
+>>new ip addrees on recreation if the pod dies
+
+
+service:
+
+>>permanenet ip address that can attach to your pod , each pod has its won service
+>>even if the pod dies , the ip address will stay 
+
+
+>>your app need to acceessible through browser 
+so you will need to create external service 
+
+>> so for database we will use internal service 
+
+>>lets say u have external service url as http:localhost:8080 which is first unsecure one and
+you cannot provide these url to external users 
+>>you have to covvert that to name which is served by another component ingress
+
+
+>>configmap and secret 
+
+configmap contains config. data of your services like database urls or other service configs(external configuration of yiur application0
+lets say if you have to edit the endpoint , just change it in configmap thats it , no need to rebuild , push and pull again
+and database also contains crediatnals ,putting them in confingmap is not safe , so we use secrets to store secret code in base64 encoded format
+>>you can use it in your application with the help of environment varibales 
+
+
+
+ 
+lets say if the pod gets restarted , yiur data wil be gone
+to manitain ur data persistent , u can use volumes
+
+basically we use our local stoarge that is where woker node is running or or use some remote storages to store
+
+what if the my application pod crahses like app can't be reached??
+
+we are replicating samethngs in another servers and these repicas will connected to the same service
+service is also a load balancer 
+
+ deploymets
+in these you can create deploymets  , there you can specify replica sets how many u want to have 
+
+what if ur database crashes  
+bascially you cannoot replicate databases via deploymets as databases  has state which has data 
+
+to avoid data consistency ,we use stateful set for stateFul apps or databases
+
+
+now come to worker nodes and master nodes
+
+
+node processes
+
+>>each node will have multiple pods
+>>3 process must be intsalled on every node
+>>1st process is container run time here we are using docker 
+>>kublet interacts with the node itself and the container run time
+>>kublet is responsible for starts the pod with a container  inside  
+>>kubeproxy forwards the requets 
+
+4 process run on master nodes
+
+>>api server is the one who takes inputs from the user using command line interface tool kubetctl . In this way we contact with the master node and feed our requets 
+
+>>lets say you want to create a pod 
+0
+so  you can feed request using "kubectl create deployment name image" (this name will be available under metadata name  of the congif file)
+
+which will create pod , you can list pods using "kubectl get pod" 
+
+>By default , in deployment config file , you will have one replica only you can edit the config file using kubectl edit "deploymemt <deployment_name>" and chnage your replicaset 
+ again do kubectl get pod
+
+>>here container run time pulls the dockerimage form dockerhub 
+
+>> you can create  ur own config files using yaml 
+
+
+how u connect ur components ,how service conncects with the deployments 
+
+it uses labels and selectors
+
+here metadat contains labels and spec contains selectors 
+
+
+
+
+
+
+ 

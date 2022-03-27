@@ -1,0 +1,7 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Do not count this as a failure
+      ansible.builtin.command: /bin/false
+      ignore_errors: yes       

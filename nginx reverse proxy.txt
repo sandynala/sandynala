@@ -1,0 +1,49 @@
+#main contest/global context --------> here the main context is used to configure details that effect the entire application like  the  user and group to run the worker proccess , 
+                                       no of worker process , PID, CPU affinity,niceness etc.,
+
+events{
+   it tells how worker process should handle connections . syntax: directive < parameter 1> <parameter 2>
+}
+
+http{ ----------> while configuring nginx as web or reverse proxy , the http context will hold majority of the configuration . contains all the directives and other contexts necessary to define 
+                  how the program will handle http or https connections 
+
+ server1{--------> decleared within the http context. 
+    
+    listen:
+    server_name:
+  }
+ location match_modifier location_match{
+
+  }
+
+ server2{
+  
+  }
+}
+
+
+
+
+first you should know what are directives and contexts???
+
+>>>>nginx config consists of key value pairs are called directives. It decides which confuguration to apply . They can be organized and grouped into blocks called contexts 
+>>>contexts looks like tree like structures that can be nested within one another and directives can only be used within contexts
+
+directive looks like
+
+user nginx;
+worker_proecesses 5;
+
+conetxt looks like
+
+#main context 
+
+.....
+....
+
+#http context
+http{
+ directive
+ directive
+}

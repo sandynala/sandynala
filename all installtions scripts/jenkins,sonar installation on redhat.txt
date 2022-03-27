@@ -1,0 +1,169 @@
+
+------------------------------------------------------------------------------jenkins on redhat------------------------------------------------------------------------------------------
+use t2.medium
+
+********hostname and usercreation***********
+
+hostnamectl set-hostname jenkins
+sudo useradd ravi
+sudo passwd ravi
+sudo visudo(granting ravi sudo access)
+ravi ALL=(ALL) NOPASSWD: ALL
+
+
+*********installing jenkins under user ravi'**************
+sudo yum install wget -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+sudo yum install epel-release # repository that provides 'daemonize'
+if above epel not working use the below one
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo yum install java-11-openjdk-devel -y
+sudo yum install jenkins -y
+sudo systemctl start jenkins.service
+sudo systemctl status jenkins.service
+sudo systemctl enable jenkins.service
+
+if you update any configs in global tool and want ur jenkins to update . you can retstart the jenkins
+sudo systemctl restart jenkins.service
+
+***********setting JAVA_PATH***************
+
+readlink -f $(whereis java)
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.14.0.9-2.el8_5.x86_64          /usr/lib/jvm/java-8-openjdk-amd64    
+echo $JAVA_HOME
+export PATH=$PATH:$JAVA_HOME/bin
+echo $PATH
+
+************to set JAVA PATH permanentlty********
+
+echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.14.0.9-2.el8_5.x86_64" >> ~/.bashrc
+echo $JAVA_HOME
+vi ~/.bashrc
+export PATH=$PATH:$JAVA_HOME/bin" and :wq(save the file)
+echo $PATH
+source ~/.bashrc
+
+*********to select a particular java_version**************
+
+sudo update-alternatives --config java
+
+**********to view jenkins password*******************
+
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+********to install git**********
+
+sudo yum install git -y
+
+********to find path*********
+
+readlink -f $(whereis git)
+/usr/bin/git
+
+
+
+pub   rsa4096 2020-03-30 [SC] [expires: 2023-03-30]
+      62A9756BFD780C377CF24BA8FCEF32E745F2C3D5
+uid                      Jenkins Project 
+sub   rsa4096 2020-03-30 [E] [expires: 2023-03-30]
+------------------------------------------------------------------------------sonarqube on redhat-----------------------------------------------------------------------------------------
+****use instance type t2.medium*****
+
+hostnamectl set-hostname jenkins
+sudo useradd ravi
+sudo passwd ravi
+visudo(granting ravi sudo access)
+ravi ALL=(ALL) NOPASSWD: ALL
+
+*********** to install docker on redhat ****************
+
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/rhel/docker-ce.repo
+
+sudo yum install docker-ce docker-ce-cli containerd.io
+
+  - Status code: 404 for https://download.docker.com/linux/rhel/8/x86_64/stable/repodata/repomd.xml (IP: 99.86.231.53)
+
+Agian repeated the below stops to solve the above error
+
+sudo yum install -y yum-utils
+sudo yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io -y
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+sudo systemctl status docker.service
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker.service
+sudo netstat -lntp | grep dockerd
+********to run docker commands with the created user*********
+change to root-user 
+sudo usermod -aG docker ravi
+
+*********** sonarqube image ****************
+
+docker run -dit --name sonar -p 9000:9000 sonarqube:latest
+
+to rename the container 
+docker rename <sad_shirley(old)> <sonar(new)>
+
+*************what if the container exiting immediately??***************
+
+you have to override the entrypoint
+docker run -it --entrypoint=/bin/bash myimagename
+
+************to install net utils on redhat linux***************
+
+sudo yum -y install net-tools
+
+************to create volume***************
+docker volume create sonar_volume
+
+
+**********to find created volume in ur local host*******
+
+docker inspect sonar_volume
+
+lets say u want to keep ur sonarqube logs to be persistent , u can mount the created volume on /opt/sonarqube/logs
+
+these created volume is availabe in ur local host machine :/var/lib/docker/volumes/sonar_volume
+
+docker run -dit --name sonar -v sonar_volume:/opt/sonarqube/logs -p 9000:9000 sonarqube:latest
+
+to know more:https://phoenixnap.com/kb/docker-volumes
+
+
+**********************************************CI/CD Pipeline****************************************************
+to enable email notification
+
+https://stackoverflow.com/questions/35347269/javax-mail-authenticationfailedexception-535-5-7-8-username-and-password-not-ac
+
+type this in browser: gmail smtp settings
+
+https://netcorecloud.com/tutorials/install-and-configure-email-notifications-in-jenkins/
+
+****************depoloying app on tomat server***********
+
+inside tomcat container:
+docker exec -it javaapp_7 bash
+cd /usr/local/tomcat/conf
+ls -al
+vi tomcat-users.xml
+paste this 
+<role rolename="manager-gui"/>
+<user username="admin" password="admin" roles="admin-gui,manager-gui"/> and save :wq!
+
+cd /usr/local/tomcat/bin
+ls -al
+shutdown.sh
+docker start javaapp_7
+
+and login into tomact using admin and admin
+
+to find ur jarfile
+/usr/local/tomcat/webapps

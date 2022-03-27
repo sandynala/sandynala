@@ -1,0 +1,9 @@
+hosts: db
+tasks:
+  - name: Here we copy the variable value to remote
+    copy:
+      dest: "/tmp/sample"
+      content: "the username value is {{username}}"         
+
+
+

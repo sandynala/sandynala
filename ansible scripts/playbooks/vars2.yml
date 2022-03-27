@@ -1,0 +1,9 @@
+--- 
+- hosts: all
+  become: yes
+  vars_files:
+    - supply_external_var_file.yml
+  tasks:
+    - name: accessing varibale from external file       
+      debug:
+        msg: "the fruit name is {{fruit}}"     

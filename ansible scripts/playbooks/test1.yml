@@ -1,0 +1,62 @@
+---
+- name: Play2
+  hosts: all
+  gather_facts: yes
+  become: true
+  vars:
+    - example: author is ravi kumar 
+  tasks:
+    - name: package updating ......
+      shell: apt update -y
+    - name: creating user
+      user:
+        name: indra
+        create_home: yes
+        shell: /bin/bash
+    - name: creating file
+      file:
+        path: /home/ansible_admin/kubernetes/sample2
+        state: touch
+    - name: creating file
+      become_user: ansible_admin
+      file:
+        path: /home/ansible_admin/kubernetes/sample3
+        state: touch
+    - name: creating directory
+      become_user: ansible_admin
+      file:
+        path: /home/ansible_admin/kubernetes/dir
+        state: directory
+    - name: install aws_cli
+      shell: apt install git -y
+      tags: cli
+    - name: creting multiple files
+      file:
+        path: /home/ansible_admin/kubernetes/"{{item}}"
+        state: touch
+      with_items:
+        - file1
+        - file2
+      tags: fil 
+    - name: using variables and accessing it 
+      debug:
+        msg: "{{example}}"
+      tags: var
+    - name: copying files 
+      copy:
+        src: /home/ansible_admin/kubernetes/sample2
+        dest: /home/
+        owner: ansible_admin
+        group: ansible_admin
+        mode: '0755' 
+      tags: cop
+    - name: checking os_version
+      debug: msg="{{ansible_distribution}}"
+      tags: version
+
+    - name: using register variable
+      shell: ls -al
+      register: find_output
+    - debug:
+        var: "{{find_output}}"
+      tags: regi  

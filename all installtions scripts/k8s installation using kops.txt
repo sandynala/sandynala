@@ -1,0 +1,97 @@
+
+>>sudo apt install awscli -y
+
+>>to install kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl 
+chmod +x ./kubectl 
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+>>to install kops
+curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64 
+chmod +x kops-linux-amd64 
+sudo mv kops-linux-amd64 /usr/local/bin/kops
+
+>>aws configure
+
+create one user and give programmatic access to him by attchinh these policies
+
+>>aws iam create-group --group-name kops1(creating iam group with name as kops)
+added these policies to this group
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonRoute53FullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/IAMFullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonVPCFullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonSQSFullAccess --group-name kops1
+aws iam attach-group-policy --policy-arn arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess --group-name kops1
+
+>>>>aws iam create-user --user-name kops1(creating iam user with name as kops)
+>>aws iam add-user-to-group --user-name kops1 --group-name kops(adding user to group)
+>>aws iam create-access-key --user-name kops1 
+>>aws iam list-users
+
+
+>>aws s3 mb s3://dev.k8s.testpage.in
+>>export KOPS_STATE_STORE=s3://dev.k8s.testpage.in
+>>export AWS_ACCESS_KEY_ID='AKIAZUCJXXYUNDPFSKMA'
+>>export AWS_SECRET_ACCESS_KEY='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'
+>>ssh-keygen
+
+>>cretaed private hosted zone in Route53 and named as testdomain.com
+
+**********creating cluster***************
+
+ >>kops create cluster --name=new.devenv.com \
+  --cloud=aws \
+  --state=s3://dev.k8s.testpage.in \
+  --zones=us-east-2b \
+  --node-count=2 \
+  --dns-zone=devenv.com \
+  --dns private \
+  --kubernetes-version 1.19.8
+
+>>kops update cluster --name new.devenv.com --yes --admin
+
+>>kops validate cluster
+
+>>kubectl get nodes
+
+*************You can look at all system components with the following command.******************
+
+kubectl -n kube-system get po
+
+*******cluster manifest******
+
+kops get --name new.testdomain.com -o yaml
+
+
+********to list nodes with all components associated with it  ********
+kubectl get nodes -o wide
+
+>>kubectl create deployment nginx1 --image=nginx
+>>kubectl get deployment(to list all deploymets)
+>>kubectl create service nodeport nginx1 --tcp=80:80( to create service of type nodeport)
+>>kubectl get svc(to list all services)
+>>check the nodeport is open on security groups otherwise it will not connect to the host ip
+
+>>kubectl get replicaset
+>>kubectl describe deployment nginx1
+
+ref this to know more: https://kops.sigs.k8s.io/getting_started/aws/
+https://docs.google.com/document/d/1ys8sN4Vn8yeNC7qXjyyxOm5CxrmGVCX7/edit
+https://www.tecmint.com/deploy-nginx-on-a-kubernetes-cluster/
+https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/
+
+aws s3 ls s3://dev.k8s.testpage.in/new.devenv.com/
+
+
+>ClusterIP – This Service-type generally exposes the service on an internal IP, reachable only within the cluster, and possibly only within the cluster-nodes.
+
+>NodePort – This is the most basic option of exposing your service to be accessible outside of your cluster, on a specific port (called the NodePort) on every node in the cluster.
+
+LoadBalancer – This option leverages on external Load-Balancing services offered by various providers to allow access to your service. 
+This is a more reliable option when thinking about high availability for your service, and has more feature beyond default access.
+ExternalName – This service does traffic redirect to services outside of the cluster. As such the service is thus mapped to a DNS name that could be hosted out of your cluster. 
+It is important to note that this does not use proxying.
+
+

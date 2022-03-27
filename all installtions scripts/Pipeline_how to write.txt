@@ -1,0 +1,419 @@
+>>>Automation is a core principle for achieving DevOps success
+>>>CI/CD comprises of continuous integration and continuous delivery or continuous deployment
+>>>“CI/CD pipeline”—a series of automated workflows that help DevOps teams cut down on manual tasks
+
+
+>>Continuous integration (CI) automatically builds, tests, and integrates code changes within a shared repository; then
+>>Continuous delivery (CD) automatically delivers code changes to production-ready environments for approval
+>>Continuous deployment (CD) automatically deploys code changes to customers directly.     source:https://resources.github.com/ci-cd/
+
+workflow(Buidling CI/CD toolkit)
+
+CI begins in shared repositories, where teams collaborate on code using version control systems (VCS) like Git. 
+A VCS keeps track of code changes and makes them easy to revert if something breaks. 
+It also enables configuration as code, which allows teams to manage testing, infrastructure, and more as versioned artifacts.
+
+CI build tools automatically package up files and components into release artifacts and run tests for quality,
+ performance, and other requirements. 
+After clearing required checks, CD tools send builds off to the operations team for further testing and staging.
+
+>>delpoyement is done with the help  of dockers(Vagrant/terraform/ansible) where we create containers , inside that we place our applicationcode and its depenedicies, binaries etc.,
+>>What we do if the container is down and how we can make containers always up and running 
+For that we use Kubernetes which is an orchestration tool which makes containers always up and runnning. We place 
+containers in pods of worker nodes and create replicas of that pod so that if one container is down ,others can will be up and running until it gets repaired.
+
+
+CI/CD  Pipeline 
+
+
+>>Jenkins provides two ways of developing a pipeline- Scripted and Declarative.
+>>In Jenkins 2.0, Jenkins introduced a new way to create jobs using the technique called pipeline as code
+>>In pipeline as code technique, jobs are created using a script file that contains the steps to be executed by the job
+>>In Jenkins, that scripted file is called Jenkinsfile.
+
+What is Jenkinsfile?
+Jenkinsfile is just a text file, usually checked in along with the project’s source code in Git repo.
+ Ideally, every application will have its own Jenkinsfile.
+
+Jenkinsfile can be written in two aspects – Scripted pipeline syntax & Declarative pipeline syntax
+
+What is Jenkins Scripted Pipeline?
+
+Jenkins pipelines are traditionally written as scripted pipelines. 
+Ideally, the scripted pipeline is stored in Jenkins webUI as a Jenkins file. 
+The end-to-end scripted pipeline script is written in Groovy.
+
+It requires knowledge of Groovy programming as a prerequisite.
+Jenkinsfile starts with the word node.
+Can contain standard programming constructs like if-else block, try-catch block, etc.
+
+Example :
+node {
+    stage('Stage 1') {
+        echo 'hello'
+    }
+}
+
+What is Jenkins Declarative Pipeline?
+
+>>Jenkins declarative pipeline needs to use the predefined constructs to create pipelines. 
+>>Hence, it is not flexible as a scripted pipeline.
+>>Jenkinsfile starts with the word pipeline.
+>>Jenkins declarative pipeline should be the preferred way to create a Jenkins job as they offer a rich set of features, 
+come with less learning curve & no prerequisite to learn a programming language like Groovy just for the sake of writing pipeline code.
+>>We can also validate the syntax of the Declarative pipeline code before running the job. It helps to avoid a lot of runtime issues with the build script.
+>> recommended VS Code IDE for writing Jenkins pipeline scripts, especially when creating Jenkins Declarative pipeline examples.
+
+Syntax:
+
+pipeline {
+    agent any
+    stages {
+        stage('Welcome Step') {
+            steps { 
+                echo 'Welcome to LambdaTest'
+            }
+        }
+    }
+}
+
+>>Step 1: Open Jenkins home page (http://localhost:8080 in local) & click on New Item from the left side menu.
+>>Step 2: Enter Jenkins job name & choose the style as Pipeline & click OK.
+>>Step 3: Scroll down to the Pipeline section & copy-paste your first Declarative style Pipeline code from below to the script textbox.
+>>Step 4: Click on the Save button & Click on Build Now from the left side menu.
+We can see the build running stage by stage in Stage View
+>>Step 5: To check logs from Build Job, click on any stage & click on the check logs button. 
+Or you can use the Console Output from the left side menu to see the logs for the build.
+
+1)agent
+
+>>Specify where the Jenkins build job should run. agent can be at pipeline level or stage level. 
+>>It’s mandatory to define an agent.
+
+pipeline {
+     agent any
+}
+
+2)none 
+
+ >>Don’t allocate any agent globally for the pipeline. Every stage should specify their own agent to run.
+
+pipeline {
+     agent none
+}	
+
+3)label –
+>> Run the job in agent which matches the label given here. 
+>>Remember Jenkins CI/CD can work on Master/Agent architecture. 
+>>Master nodes can delegate the jobs to run in Agent nodes. Nodes on creation given a name & label to identify them later.
+
+E.g All linux nodes can be labeled as linux-machine
+
+pipeline {
+       agent {
+           label 'linux-machine'
+       }
+
+4)docker – Run the job in given Docker container
+
+5)stages
+
+>>stages block constitutes different executable stage blocks.
+>>At least one stage block is mandatory inside stages block.
+
+
+pipeline {
+       agent {
+           label 'linux-machine'
+       }
+     stages {
+     }
+}
+
+6)Stage
+
+>>stage block contains the actual execution steps.
+>>Also its mandatory to name each stage block & this name will be shown in the Stage View after we run the job.
+
+
+pipeline {
+       agent {
+           label 'linux-machine'
+       }
+     stages {
+         stage('build step') {
+         }
+     }
+}
+
+7) Steps
+
+>>steps block contains the actual build step. 
+>>It’s mandatory to have at least one step block inside a stage block.
+>>Depending on the Agent’s operating system (where Jenkins job runs), we can use shell, bat, etc., inside the steps command.
+
+
+pipeline {
+     agent any
+     stages {
+         stage('build step') {
+              steps {
+                 echo "Build stage is running"
+              }
+         }
+     }
+}
+
+8)environment
+
+Key value pairs which helps passing values to job during job runtime from outside of Jenkinsfile. 
+It’s one way of externalizing configuration.
+Example- Usually, Jenkins jobs will run in a separate server. 
+We may not be sure where the installation path of JAVA or JMeter is that server. 
+Hence these are ideal candidates to be configured in Environment variables & passed during job run.
+
+Method 1 : Configure Environment Variable in Jenkins CI/CD portal
+
+Step 1: Open Jenkins Server URL (http://localhost:8080)
+
+Step 2: Click on Manage Jenkins from the left sidebar menu
+
+Step 3: Click on Configure System under System Configuration.
+
+Step 4: Scroll down to the Global Properties section. This is where we will add our Environment variables.
+
+Step 5: Click on the Add button under Environment Variables & enter the Key & value.
+
+We have added the Java installation path under the variable name JAVA_INSTALLATION_PATH
+
+Step 6: Click on Save Button.
+
+Refer Environment variable in Jenkinsfile
+We can refer to the Environment variables in declarative pipeline using the ${} syntax
+
+
+9)tools
+
+This block lets us add pre configured tools like Maven or Java to our job’s PATH. It’s an optional block.
+
+To use any tool, they have to be pre-configured under the Global Tools Configuration section. 
+For this example, let’s see how to configure Maven. 
+
+>>Click on Global Tools Configuration under System Configuration.
+>>Scroll down to the Maven section & click on Maven Installations.
+Step a: Click on the Add Maven button. Enter the following values in the configuration.
+
+Name – Maven 3.5.0
+MAVEN_HOME – Enter the maven installation path in local
+
+Alternatively we can download Maven from Internet instead of pointing to the local installation path by enabling the Install Automatically checkbox.
+
+step b:Click on Add Installer button & choose Install from Apache.
+Step c: Choose the Maven version to download. We have chosen the Maven version 3.6.3.
+step d:Click on the Save button.
+Refer to Maven tool in Pipeline in tools block with the name we used while configuring in Global Tools Configuration (MAVEN_PATH in this example).
+
+
+pipeline {
+    agent any
+    tools {
+        maven 'MAVEN_PATH' 
+    }
+    stages {
+         stage('Load Tools') {
+              steps {
+                 sh "mvn -version"
+              }
+         }
+     }
+}
+
+
+Sample code;
+
+
+pipeline {
+    agent any
+    tools {
+        maven 'MAVEN_PATH'
+        jdk 'jdk8'
+    }
+    stages {
+        stage("Tools initialization") {
+            steps {
+                sh "mvn --version"
+                sh "java -version"
+            }
+        }
+        stage("Checkout Code") {
+            steps {
+                git branch: 'master',
+                url: "https://github.com/iamvickyav/spring-boot-data-H2-embedded.git"
+            }
+        }
+        stage("Building Application") {
+            steps {
+               sh "mvn clean package"
+            }
+        }
+        stage("Code coverage") {
+           steps {
+               jacoco(
+                    execPattern: '**/target/**.exec',
+                    classPattern: '**/target/classes',
+                    sourcePattern: '**/src',
+                    inclusionPattern: 'com/iamvickyav/**',
+                    changeBuildStatus: true,
+                    minimumInstructionCoverage: '30',
+                    maximumInstructionCoverage: '80')
+               }
+           }
+        }
+ }
+
+Less than 30 – Build will be marked as Failure.
+Between 30 & 80 – Build will be marked as Unstable.
+Above 80 – Build will be marked as Success.
+
+Sonarqube:
+
+ stage('Code Quality') {
+                   steps {
+                       script {
+                          def scannerHome = tool 'fosslinxsonar';
+                          withSonarQubeEnv("fosslinxSonarqubeserver") {
+                          sh "${tool("fosslinxsonar")}/bin/sonar-scanner"
+                                       }
+                               }
+                           }
+                        }
+
+
+
+
+
+
+
+In this, we'll look at one of the more powerful features of Jenkins: parameterized builds.
+
+>>>A build parameter allows us to pass data into our Jenkins jobs. 
+Using build parameters, we can pass any data we want: git branch name, secret credentials, hostnames and ports, and so on.
+
+>>>Any Jenkins job or pipeline can be parameterized. All we have to do is check the box on the General settings tab that says 
+This project is parameterized:
+
+Then we click the Add Parameter button. From here, we must specify several pieces of information:
+
+>>>Type:              the data type for the parameter (string, boolean, etc.)
+>>>Name:              the name by which the parameter will be identified
+>>>Default value:     an optional value that will be used when a user does not specify one
+>>>Description:       optional text that describes how the parameter is used
+
+A single Jenkins job or pipeline can have multiple parameters. The only restriction is the parameter name must be unique.
+
+
+Jenkins supports several parameter types. Below is a list of the most common ones, 
+but keep in mind that different plugins may add new parameter type
+
+ Types of Parameters
+
+>>>String: any combination of characters and numbers
+>>>Choice: a pre-defined set of strings from which a user can pick a value
+>>>Credentials: a pre-defined Jenkins credential
+>>>File: the full path to a file on the filesystem
+>>>Multi-line String: same as String, but allows newline characters
+>>>Password: similar to the Credentials type, but allows us to pass a plain text parameter specific to the job or pipeline
+>>>Run: an absolute URL to a single run of another job
+
+Accessing build paramteres using shell command
+
+>>>With a traditional Jenkins job, 
+we define one or more build steps. The most common build step is executing a shell script or Windows batch commands.
+
+>>>Let's say we have a build parameter named packageType. 
+Inside a shell script, we can access build parameters just like any other environment variable using the shell syntax:
+
+${packageType} -----> you can acess build parameter in this format
+
+Accessing build paramteres inside pipeline
+
+>>>Inside a Jenkins Pipeline, accessing a build parameter can be done in multiple ways.
+
+>>>First, all build parameters are placed into a params variable. This means we can access a parameter value using dot notation:
+
+
+Eg:
+
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            when {
+                expression { params.jdkVersion == "14" }
+            }
+        }
+    }
+}
+
+
+Second, the build parameters are added to the environment of the pipeline. 
+This means we can use the shorter shell syntax inside a step that executes a shell script:
+
+Eg:
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo "${packageType}"
+            }
+        }
+    }
+
+Setting Parameter Values
+
+So far, we've seen how to define parameters and use them inside our Jenkins jobs. 
+The final step is to pass values for our parameters when we execute jobs.
+
+>>>Starting a job with Jenkins UI is the easiest way to pass build parameters. 
+All we do is log in, navigate to our job, and click the Build with Parameters link:
+
+>>>This will take us to a screen that asks for inputs for each parameter. Based on the type of parameter, 
+the way we input its value will be different.
+
+>>>For example, String parameters will show up as a plain text field. Boolean parameters will be displayed as a checkbox. And Choice parameters are displayed as a dropdown list:
+
+
+Once we provide a value for each parameter, all we have to do is click the Build button, and Jenkins begins executing the job.
+
+Remote Execution
+
+>>>Jenkins jobs can also be executed with a remote API call. We do this by calling a special URL for the job on our Jenkins server:
+
+http://<JENKINS_URL>/job/<JOB_NAME>/buildWithParameters/packageType=war&jdkVersion=11&debug=true
+
+Note that these requests have to be sent as POST command. We also have to provide credentials using HTTP basic auth.
+
+>> >Let's see a full example using curl:
+
+curl -X POST --user user:apiToken \
+    http://<JENKINS_URL>/job/<JOB_NAME>/buildWithParameters/packageType=war&jdkVersion=11&debug=true
+
+The user can be any Jenkins user, and the apiToken is any associated API token for that user.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

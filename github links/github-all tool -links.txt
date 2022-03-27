@@ -1,0 +1,13 @@
+
+****marvick all tool code files link 
+_____________________________________
+--httpsgithub.commavrick202tab=repositories&q=kubernetes&type=&language=&sort=
+
+****HoussemDellai[azuredevops basic ci- build script for java app]
+_________________________________________
+https://github.com/HoussemDellai/gs-spring-boot/blob/master/AzurePipelines-CI.yaml
+
+
+
+****HoussemDellai[azuredevops ci/cd webapp with database script for app]
+https://github.com/HoussemDellai/WebAppWithDatabaseDemo/blob/master/03_azure-pipelines-ci-cd.yml

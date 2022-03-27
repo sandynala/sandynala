@@ -1,0 +1,41 @@
+
+Control plane
+Protocol Direction Port Range	  Purpose	           Used By
+TCP	Inbound	  6443	       Kubernetes API server	    All
+TCP	Inbound	  2379-2380	etcd server client API	 kube-apiserver, etcd
+TCP	Inbound	  10250	     Kubelet APISelf,            Control plane
+TCP	Inbound	  10259	     kube-scheduler                    Self
+TCP	Inbound	 10257	  kube-controller-manager	        Self
+
+Worker node(s)
+Protocol Direction	Port Range	Purpose	         Used By
+TCP	Inbound	        10250	     Kubelet APISelf,     Control plane
+TCP	Inbound	    30000-32767	    NodePort Services†	All
+
+-------------------------------------------------------------------------------------------------------------------
+
+Services binding to the default Host interface
+Port	Service	Access Restrictions
+16443	API server	SSL encrypted. Clients need to present a valid password from a Static Password File 24.
+10250	kubelet	Anonymous authentication is disabled. X509 client certificate 2 is required.
+10255	kubelet	Read only port for the Kubelet.
+25000	cluster-agent	Proper token required to authorise actions.
+12379	etcd	SSL encrypted. Client certificates required to connect.
+10257	kube-controller	Serve HTTPS with authentication and authorization.
+10259	kube-scheduler	Serve HTTPS with authentication and authorization.
+19001	dqlite	SSL encrypted. Client certificates required to connect.
+Services binding to the localhost interface
+Port	Service	Description
+10248	kubelet	Localhost healthz endpoint.
+10249	kube-proxy	Port for the metrics server to serve on.
+10251	kube-schedule	Port on which to serve HTTP insecurely.
+10252	kube-controller	Port on which to serve HTTP insecurely.
+10256	kube-proxy	Port to bind the health check server.
+2380	etcd	Used for peer connections.
+1338	containerd	Metrics port
+
+Containerd and etcd
+Both these services are exposed through unix sockets.
+
+Service	Socket
+containerd	unix:///var/snap/microk8s/common/run/containerd.sock

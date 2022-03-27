@@ -1,0 +1,34 @@
+:
+>>ad hoc commands
+>>playbooks
+>>loops
+>>Controlling where tasks run: delegation and local actions
+>>Conditionals
+>>Tests
+>>Blocks
+>>Handlers: running operations on change
+>>Error handling in playbooks
+>>Re-using Ansible artifacts
+>>Roles
+>>Tags
+>>Working with dynamic inventory
+>>Patterns: targeting hosts and groups
+>>Connection methods and details
+>>Working with command line tools
+>>Using Variables
+>>Discovering variables: facts and magic variables
+>>Encrypting content with Ansible Vault
+>>Using filters to manipulate data
+>>lookups
+>>Validating tasks: check mode and diff mode
+>>Debugging tasks
+>>Working With Modules
+>>Playbook Keywords
+
+    - name: want to know what type of os is this
+
+      debug:
+        msg: "the os version is {{ansible_os_family}}"
+
+https://www.linuxtechi.com/how-to-use-loops-in-ansible-playbook/
+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
